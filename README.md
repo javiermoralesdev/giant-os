@@ -10,3 +10,11 @@ Running the project is as easy as executing the Makefile and running it with you
 make
 qemu-system-x86_64 -cdrom giant-os.iso
 ```
+
+Or just can build and run directly
+
+```
+make run
+```
+
+It is strongly recommended to use QEMU but you can use any software you prefer
