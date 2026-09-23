@@ -92,6 +92,7 @@ static void draw_menu(void) {
 }
 
 static Screen process_menu(void) {
+
   while (1) {
     char character = keyboard_get_char();
 

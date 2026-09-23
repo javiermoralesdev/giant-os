@@ -18,3 +18,6 @@ make run
 ```
 
 It is strongly recommended to use QEMU but you can use any software you prefer
+
+## WARNING
+Although it's tecnically possible to run it on real hardware, it has never been tested that way and has only been executed on virtual machines. RUN AT YOUR OWN RISK!
