@@ -1,3 +1,4 @@
+#include "memory.h"
 #include "toolbox.h"
 #include "terminal.h"
 #include "keyboard.h"
@@ -112,6 +113,7 @@ static Screen process_menu(void) {
 
 
 void kernel_main(void) {
+  kmalloc_init();
   while (1) {
     switch (current_screen) {
     case SCREEN_MENU:

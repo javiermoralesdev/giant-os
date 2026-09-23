@@ -10,7 +10,7 @@ KERNEL_DIR = kernel
 ISO_DIR = iso
 
 # Files
-ASM_SRC = $(KERNEL_DIR)/entry.asm
+ASM_SRC = $(KERNEL_DIR)/entry.s
 ASM_OBJ = $(KERNEL_DIR)/entry.o
 
 C_SRC = $(KERNEL_DIR)/kernel.c
@@ -25,6 +25,8 @@ GAME_SRC = $(KERNEL_DIR)/game.c
 GAME_OBJ = $(KERNEL_DIR)/game.o
 TOOLBOX_SRC = $(KERNEL_DIR)/toolbox.c
 TOOLBOX_OBJ = $(KERNEL_DIR)/toolbox.o
+MEMORY_SRC = $(KERNEL_DIR)/memory.c
+MEMORY_OBJ = $(KERNEL_DIR)/memory.o
 
 KERNEL_BIN = kernel.bin
 ISO_IMAGE = giant-os.iso
@@ -37,7 +39,8 @@ CFLAGS = -m64 \
          -mno-red-zone \
          -mno-mmx \
          -mno-sse \
-         -mno-sse2
+         -mno-sse2 \
+		 -Werror
 
 LDFLAGS = -m elf_x86_64 \
           -T linker.ld
@@ -68,9 +71,12 @@ $(GAME_OBJ): $(GAME_SRC)
 $(TOOLBOX_OBJ): $(TOOLBOX_SRC)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(MEMORY_OBJ): $(MEMORY_SRC)
+	$(CC) $(CFLAGS) -c $< -o $@
+
 # Link the kernel
-$(KERNEL_BIN): $(ASM_OBJ) $(C_OBJ) $(TERMINAL_OBJ) $(KEYBOARD_OBJ) $(LEVELS_OBJ) $(GAME_OBJ) $(TOOLBOX_OBJ) linker.ld
-	$(LD) $(LDFLAGS) -o $@ $(ASM_OBJ) $(C_OBJ) $(TERMINAL_OBJ) $(KEYBOARD_OBJ) $(LEVELS_OBJ) $(GAME_OBJ) $(TOOLBOX_OBJ)
+$(KERNEL_BIN): $(ASM_OBJ) $(C_OBJ) $(TERMINAL_OBJ) $(KEYBOARD_OBJ) $(LEVELS_OBJ) $(GAME_OBJ) $(TOOLBOX_OBJ) $(MEMORY_OBJ) linker.ld
+	$(LD) $(LDFLAGS) -o $@ $(ASM_OBJ) $(C_OBJ) $(TERMINAL_OBJ) $(KEYBOARD_OBJ) $(LEVELS_OBJ) $(GAME_OBJ) $(TOOLBOX_OBJ) $(MEMORY_OBJ)
 
 # Copy the kernel and create the ISO
 $(ISO_IMAGE): $(KERNEL_BIN)
@@ -90,6 +96,7 @@ clean:
 	rm -f $(LEVELS_OBJ)
 	rm -f $(GAME_OBJ)
 	rm -f $(TOOLBOX_OBJ)
+	rm -f $(MEMORY_OBJ)
 	rm -f $(KERNEL_BIN)
 	rm -f iso/boot/$(KERNEL_BIN)
 	rm -f $(ISO_IMAGE)
