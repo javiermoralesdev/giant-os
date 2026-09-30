@@ -21,10 +21,16 @@
 #define COLOR_YELLOW 0x0E
 #define COLOR_WHITE 0x0F
 
+void terminal_init(void);
 void terminal_clear(void);
 void terminal_putchar(char character);
 void terminal_write(const char *string);
+void terminal_new_line(void);
+void terminal_write_line(const char *string);
 void terminal_set_color(unsigned char color);
 void terminal_set_cursor(int row, int column);
+void terminal_update_hardware_cursor(int row, int column);
+void terminal_enable_cursor(unsigned char cursor_start, unsigned char cursor_end);
+void terminal_scroll(void);
 
 #endif

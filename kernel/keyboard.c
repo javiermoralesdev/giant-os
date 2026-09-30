@@ -1,12 +1,6 @@
 #include "keyboard.h"
-
-static unsigned char inb(unsigned short port) {
-  unsigned char result;
-
-  __asm__ volatile("inb %1, %0" : "=a"(result) : "Nd"(port));
-
-  return result;
-}
+#include "terminal.h"
+#include "io.h"
 
 static int keyboard_has_data(void) { return inb(0x64) & 1; }
 
@@ -27,6 +21,11 @@ static const char scancode_map[128] = {
     'b', 'n', 'm',  ',',  '.',  '/', 0,   '*',  0,   ' '};
 
 static char scancode_to_char(unsigned char scancode) {
+  // Support Delete key (0x53) in addition to Backspace (0x0E)
+  if (scancode == 0x53) {
+    return '\b';
+  }
+
   // Ignoramos scancodes fuera del rango de la tabla o scancodes de liberación
   // de tecla (release >= 0x80)
   if (scancode >= 128) {
@@ -53,4 +52,27 @@ char keyboard_get_char(void) {
     if (character != 0)
       return character;
   }
+}
+
+int keyboard_get_string(char* out){
+  int i = 0;
+  while (1) {
+    char c = keyboard_get_char();
+    if (c == '\n') {
+      terminal_putchar('\n');
+      break;
+    } else if (c == '\b') {
+      if (i > 0) {
+        i--;
+        terminal_putchar('\b');
+      }
+    } else if (c >= 32 && c <= 126) {
+      if (i < COMMAND_LINE_SIZE - 1) {
+        terminal_putchar(c);
+        out[i++] = c;
+      }
+    }
+  }
+  out[i] = '\0';
+  return i;
 }
