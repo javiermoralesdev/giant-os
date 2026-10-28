@@ -1,7 +1,7 @@
 #include "terminal.h"
 #include "memory.h"
 
-// Reservamos 1 MiB de Heap en la sección .bss de tu Kernel
+// Reservamos 1 MiB de Heap en la sección .bss del Kernel
 #define HEAP_SIZE (1024 * 1024) 
 static uint8_t heap_memory[HEAP_SIZE];
 

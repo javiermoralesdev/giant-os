@@ -3,6 +3,30 @@
 #include "terminal.h"
 #include "toolbox.h"
 #include "sokoban.h"
+#include "io.h"
+
+static void power_off(void) {
+  terminal_write_line("Apagando el sistema...");
+
+  // ACPI shutdown for QEMU (modern default piix4 / q35)
+  outw(0x604, 0x2000);
+
+  // ACPI shutdown for older QEMU / Bochs
+  outw(0xB004, 0x2000);
+
+  // ACPI shutdown for VirtualBox
+  outw(0x4004, 0x3400);
+
+  // Cloud-hypervisor / QEMU debug exit fallback
+  outb(0x501, 0x31);
+
+  // Fallback for bare metal or emulators without ACPI shutdown port:
+  // halt the CPU indefinitely.
+  terminal_write_line("El sistema se ha detenido. Puede apagar el equipo.");
+  while (1) {
+    __asm__ volatile ("cli; hlt");
+  }
+}
 
 int process_command(char* cmd, char* args){
   if (!my_strcmp(cmd, "play")) {
@@ -15,12 +39,17 @@ int process_command(char* cmd, char* args){
   }
 
   if (!my_strcmp(cmd, "help")) {
-    terminal_write_line("Comandos: play sokoban, help, clear");
+    terminal_write_line("Comandos: play sokoban, help, clear, exit");
     goto internal;
   }
 
   if (!my_strcmp(cmd, "clear")) {
     terminal_clear();
+    goto internal;
+  }
+
+  if (!my_strcmp(cmd, "exit") || !my_strcmp(cmd, "shutdown")) {
+    power_off();
     goto internal;
   }
 
